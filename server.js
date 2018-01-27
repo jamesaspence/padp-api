@@ -13,6 +13,11 @@ const server = http.createServer(app);
 const io = socketIO(server);
 
 app.use(bodyParser.urlencoded({extended: false}));
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 app.get('/locations/:pageToken?', (req, res) => {
   //TODO retrieve five results at a time
@@ -36,7 +41,6 @@ app.get('/locations/:pageToken?', (req, res) => {
 
     axios.get(apiUrl, config)
       .then(response => {
-        // console.log(response.data);
         res.send(response.data);
       }).catch(err => {
         console.error(err);
