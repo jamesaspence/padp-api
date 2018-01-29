@@ -20,7 +20,6 @@ app.use(function(req, res, next) {
 });
 
 app.get('/locations/:pageToken?', (req, res) => {
-  //TODO retrieve five results at a time
   const pageToken = req.params.pageToken;
   const config = {
     params: {
@@ -45,7 +44,6 @@ app.get('/locations/:pageToken?', (req, res) => {
       res.send(response.data);
     }).catch(err => {
     console.error(err);
-    //TODO return 500 error
     res.status(500).send(JSON.stringify(err));
   });
 });
