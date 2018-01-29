@@ -22,32 +22,32 @@ app.use(function(req, res, next) {
 app.get('/locations/:pageToken?', (req, res) => {
   //TODO retrieve five results at a time
   const pageToken = req.params.pageToken;
+  const config = {
+    params: {
+      key: process.env.GMAPS_API_KEY
+    }
+  };
   if (pageToken) {
-    //TODO handle w/ page token, return next set of results
+    config.params.pagetoken = pageToken;
   } else {
-    //TODO handle w/ lat long
     const lat = req.query.lat;
     const lng = req.query.lng;
 
-    const apiUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json`;
-    const config = {
-      params: {
-        location: `${lat},${lng}`,
-        rankby: `distance`,
-        type: `restaurant`,
-        key: process.env.GMAPS_API_KEY
-      }
-    };
-
-    axios.get(apiUrl, config)
-      .then(response => {
-        res.send(response.data);
-      }).catch(err => {
-        console.error(err);
-        //TODO return 500 error
-        res.status(500).send(JSON.stringify(err));
-      });
+    config.params.location = `${lat},${lng}`;
+    config.params.rankby = `distance`;
+    config.params.type = `restaurant`;
   }
+
+  const apiUrl = `https://maps.googleapis.com/maps/api/place/nearbysearch/json`;
+
+  axios.get(apiUrl, config)
+    .then(response => {
+      res.send(response.data);
+    }).catch(err => {
+    console.error(err);
+    //TODO return 500 error
+    res.status(500).send(JSON.stringify(err));
+  });
 });
 
 const port = process.env.PORT || 8080;
