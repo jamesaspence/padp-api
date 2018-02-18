@@ -12,7 +12,11 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIO(server);
 
+const RandomString = require('randomstring');
+const fs = require('fs');
+
 app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
@@ -45,6 +49,41 @@ app.get('/locations/:pageToken?', (req, res) => {
     }).catch(err => {
     console.error(err);
     res.status(500).send(JSON.stringify(err));
+  });
+});
+
+app.post('/session', (req, res) => {
+  const currentNamespaces = Object.keys(io.nsps);
+
+  let namespaceKey = new Buffer(RandomString.generate()).toString('base64');
+  while (currentNamespaces.indexOf(namespaceKey) > -1) {
+    namespaceKey = new Buffer(RandomString.generate()).toString('base64');
+  }
+
+  const data = req.body.selectedLocations;
+
+  const namespace = io.of(namespaceKey);
+
+  namespace.on('connection', function (socket) {
+    console.log('user joined!');
+    socket.broadcast.emit('userJoined');
+
+    socket.on('disconnect', function () {
+      console.log('user left!');
+      socket.broadcast.emit('userLeft');
+    });
+  });
+
+  fs.writeFile(`./sessions/${namespaceKey}.json`, JSON.stringify(data), err => {
+    if (err) {
+      //TODO handle properly
+      //TODO consider making synchronous - can't exactly continue without data
+      console.error(err);
+    }
+  });
+
+  res.send({
+    sessionId: namespaceKey
   });
 });
 
