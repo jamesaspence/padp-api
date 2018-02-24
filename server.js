@@ -4,13 +4,13 @@ require('dotenv').load();
 
 const express = require('express');
 const http = require('http');
-const socketIO = require('socket.io');
 const axios = require('axios');
 const bodyParser = require('body-parser');
 
 const app = express();
 const server = http.createServer(app);
-const io = socketIO(server);
+const SocketManager = require('./socket');
+const socketManager = new SocketManager(server);
 
 const RandomString = require('randomstring');
 const fs = require('fs');
@@ -53,26 +53,9 @@ app.get('/locations/:pageToken?', (req, res) => {
 });
 
 app.post('/session', (req, res) => {
-  const currentNamespaces = Object.keys(io.nsps);
-
-  let namespaceKey = new Buffer(RandomString.generate()).toString('base64');
-  while (currentNamespaces.indexOf(namespaceKey) > -1) {
-    namespaceKey = new Buffer(RandomString.generate()).toString('base64');
-  }
-
   const data = req.body.selectedLocations;
 
-  const namespace = io.of(namespaceKey);
-
-  namespace.on('connection', function (socket) {
-    console.log('user joined!');
-    socket.broadcast.emit('userJoined');
-
-    socket.on('disconnect', function () {
-      console.log('user left!');
-      socket.broadcast.emit('userLeft');
-    });
-  });
+  const namespaceKey = socketManager.createNamespace();
 
   fs.writeFile(`./sessions/${namespaceKey}.json`, JSON.stringify(data), err => {
     if (err) {
