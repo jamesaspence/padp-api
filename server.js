@@ -12,7 +12,6 @@ const server = http.createServer(app);
 const SocketManager = require('./socket');
 const socketManager = new SocketManager(server);
 
-const RandomString = require('randomstring');
 const fs = require('fs');
 
 app.use(bodyParser.urlencoded({extended: false}));
