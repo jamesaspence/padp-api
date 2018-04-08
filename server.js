@@ -47,9 +47,9 @@ app.get('/locations/:pageToken?', (req, res) => {
     .then(response => {
       res.send(response.data);
     }).catch(err => {
-    console.error(err);
-    res.status(500).send(JSON.stringify(err));
-  });
+      console.error(err);
+      res.status(500).send(JSON.stringify(err));
+    });
 });
 
 app.post('/session', (req, res) => {
