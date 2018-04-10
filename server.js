@@ -51,6 +51,18 @@ app.get('/locations/:pageToken?', (req, res) => {
     });
 });
 
+app.get('/data/:key', (req, res) => {
+  const path = `./sessions/${req.params.key}.json`;
+  if (!fs.existsSync(path)) {
+    res.status(404).send('Not Found');
+    return;
+  }
+
+  const json = fs.readFileSync(path);
+
+  res.send(JSON.parse(json));
+});
+
 app.post('/session', (req, res) => {
   const data = req.body.selectedLocations;
 
