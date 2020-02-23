@@ -1,5 +1,5 @@
-const socketIO = require('socket.io');
-const RandomString = require('randomstring');
+import * as socketIO from 'socket.io';
+import * as RandomString from 'randomstring';
 
 const CONNECTION_EVENT = 'connection';
 const DISCONNECTION_EVENT = 'disconnect';
@@ -7,28 +7,19 @@ const USER_COUNT_CHANGED_EVENT = 'userCount';
 
 //TODO add logger
 class SocketManager {
+  server: any;
+  io: any;
+  namespaceKeys: string[];
 
   constructor(server) {
-    this._server = server;
-    this._io = socketIO(server);
-    this._namespaceKeys = [];
-  }
-
-  get server() {
-    return this._server;
-  }
-
-  get io() {
-    return this._io;
-  }
-
-  get namespaceKeys() {
-    return this._namespaceKeys;
+    this.server = server;
+    this.io = socketIO(server);
+    this.namespaceKeys = [];
   }
 
   createNamespace() {
     const namespaceKey = this.generateNamespaceKey();
-    this._namespaceKeys.push(namespaceKey);
+    this.namespaceKeys.push(namespaceKey);
     this.initializeNamespaceEvents(namespaceKey);
 
     return namespaceKey;
@@ -120,4 +111,4 @@ class SocketManager {
   }
 }
 
-module.exports = SocketManager;
+export default SocketManager;
