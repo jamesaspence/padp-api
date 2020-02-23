@@ -27,6 +27,7 @@
     "ts-node": "^8.6.2"
   },
   "scripts": {
-    "start": "npx nodemon --watch 'src/**/*' --exec ts-node ./src/server.ts"
+    "start": "npx nodemon --watch 'src/**/*' --exec ts-node ./src/server.ts",
+    "sessions:purge": "rm ./sessions/*.session"
   }
 }
