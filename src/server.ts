@@ -54,7 +54,7 @@ router.get('/locations/:pageToken*', async ctx => {
 });
 
 router.get('/data/:key', ctx => {
-  const path = `./sessions/${ctx.params.key}.json`;
+  const path = `./sessions/${ctx.params.key}.session`;
   if (!fs.existsSync(path)) {
     ctx.throw(404);
     return;
@@ -71,7 +71,7 @@ router.post('/session', ctx => {
   const namespaceKey = socketManager.createNamespace();
 
   try {
-    fs.writeFileSync(`./sessions/${namespaceKey}.json`, JSON.stringify(data));
+    fs.writeFileSync(`./sessions/${namespaceKey}.session`, JSON.stringify(data));
     ctx.body = {
       sessionId: namespaceKey
     };
