@@ -7,8 +7,11 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "@koa/router": "^8.0.8",
     "axios": "^0.19.2",
     "dotenv": "^8.2.0",
+    "koa": "^2.11.0",
+    "koa-bodyparser": "^4.2.1",
     "randomstring": "^1.1.5",
     "socket.io": "^2.0.4"
   }
