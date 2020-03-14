@@ -8,6 +8,8 @@ import * as bodyParser from 'koa-bodyparser';
 import * as Router from '@koa/router';
 import SocketManager from './socket';
 import * as fs from 'fs';
+import { googleOAuth } from './middleware/auth';
+import * as jwt from 'jsonwebtoken';
 
 config();
 
@@ -68,6 +70,25 @@ router.get('/data/:key', ctx => {
   const buffer: Buffer = fs.readFileSync(path);
 
   ctx.body = JSON.parse(buffer.toString());
+});
+
+router.post('/oauth', googleOAuth, ctx => {
+  const { google: { decoded } } = ctx.state;
+
+  //TODO grab sub (id), picture, given_name (fname), and family name (lname). grab email too??
+
+  const { sub, picture, given_name: firstName, family_name: lastName } = decoded;
+
+  const jwtToken = jwt.sign({
+    sub,
+    picture,
+    firstName,
+    lastName
+  }, process.env.APP_SECRET, { expiresIn: '2h' });
+
+  ctx.body = {
+    token: jwtToken
+  };
 });
 
 router.post('/session', ctx => {
