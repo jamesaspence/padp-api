@@ -9,7 +9,7 @@ import * as Router from '@koa/router';
 import SocketManager from './socket';
 import * as fs from 'fs';
 import { googleOAuth } from './middleware/auth';
-import * as jwt from 'jsonwebtoken';
+import { signToken } from './auth';
 
 config();
 
@@ -74,17 +74,14 @@ router.get('/data/:key', ctx => {
 
 router.post('/oauth', googleOAuth, ctx => {
   const { google: { decoded } } = ctx.state;
-
-  //TODO grab sub (id), picture, given_name (fname), and family name (lname). grab email too??
-
   const { sub, picture, given_name: firstName, family_name: lastName } = decoded;
 
-  const jwtToken = jwt.sign({
+  const jwtToken = signToken({
     sub,
     picture,
     firstName,
     lastName
-  }, process.env.APP_SECRET, { expiresIn: '2h' });
+  });
 
   ctx.body = {
     token: jwtToken

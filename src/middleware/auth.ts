@@ -1,5 +1,7 @@
 import { Context, Middleware } from 'koa';
 import { OAuth2Client } from 'google-auth-library';
+import * as jwt from 'jsonwebtoken';
+import { verifyToken } from '../auth';
 
 export const googleOAuth: Middleware = async (ctx, next): Promise<any> => {
   const token = decodeAuthHeader(ctx);
@@ -29,6 +31,21 @@ export const googleOAuth: Middleware = async (ctx, next): Promise<any> => {
     userToken: token,
     decoded: payload
   };
+
+  await next();
+};
+
+export const jwtAuth: Middleware = async (ctx, next): Promise<any> => {
+  const token = decodeAuthHeader(ctx);
+
+  let decoded = await verifyToken(token);
+
+  if (decoded === null) {
+    ctx.throw(401, 'Invalid/expired token.');
+    return;
+  }
+
+  ctx.state.user = decoded;
 
   await next();
 };
