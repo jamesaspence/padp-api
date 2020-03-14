@@ -8,7 +8,7 @@ import * as bodyParser from 'koa-bodyparser';
 import * as Router from '@koa/router';
 import SocketManager from './socket';
 import * as fs from 'fs';
-import { googleOAuth } from './middleware/auth';
+import { googleOAuth, jwtAuth } from './middleware/auth';
 import { signToken } from './auth';
 
 config();
@@ -86,6 +86,10 @@ router.post('/oauth', googleOAuth, ctx => {
   ctx.body = {
     token: jwtToken
   };
+});
+
+router.post('/oauth/verify', jwtAuth, ctx => {
+  ctx.status = 200;
 });
 
 router.post('/session', ctx => {
