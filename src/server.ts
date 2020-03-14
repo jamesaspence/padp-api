@@ -11,8 +11,13 @@ import * as fs from 'fs';
 
 config();
 
+const { APP_PORT = 4000, APP_SECRET } = process.env;
+
+if (typeof APP_SECRET !== 'string' || APP_SECRET.length < 8) {
+  throw new Error(`"APP_SECRET" is improperly set - please ensure it is at least 8 characters long.`);
+}
+
 const app: Koa = new Koa();
-const { APP_PORT = 4000 } = process.env;
 const server = app.listen(APP_PORT, () => console.log(`Server listening at port ${APP_PORT}.`));
 const socketManager = new SocketManager(server);
 
