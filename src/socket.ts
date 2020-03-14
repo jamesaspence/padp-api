@@ -94,9 +94,9 @@ class SocketManager {
   }
 
   generateNamespaceKey() {
-    let namespaceKey = new Buffer(RandomString.generate()).toString('base64');
+    let namespaceKey = Buffer.alloc(RandomString.generate()).toString('base64');
     while (this.namespaceExists(namespaceKey)) {
-      namespaceKey = new Buffer(RandomString.generate()).toString('base64');
+      namespaceKey = Buffer.alloc(RandomString.generate()).toString('base64');
     }
 
     return SocketManager.appendSlashToKey(namespaceKey);

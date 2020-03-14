@@ -8,11 +8,18 @@ import * as bodyParser from 'koa-bodyparser';
 import * as Router from '@koa/router';
 import SocketManager from './socket';
 import * as fs from 'fs';
+import { googleOAuth, jwtAuth } from './middleware/auth';
+import { signToken } from './auth';
 
 config();
 
+const { APP_PORT = 4000, APP_SECRET } = process.env;
+
+if (typeof APP_SECRET !== 'string' || APP_SECRET.length < 8) {
+  throw new Error(`"APP_SECRET" is improperly set - please ensure it is at least 8 characters long.`);
+}
+
 const app: Koa = new Koa();
-const { APP_PORT = 4000 } = process.env;
 const server = app.listen(APP_PORT, () => console.log(`Server listening at port ${APP_PORT}.`));
 const socketManager = new SocketManager(server);
 
@@ -63,6 +70,26 @@ router.get('/data/:key', ctx => {
   const buffer: Buffer = fs.readFileSync(path);
 
   ctx.body = JSON.parse(buffer.toString());
+});
+
+router.post('/oauth', googleOAuth, ctx => {
+  const { google: { decoded } } = ctx.state;
+  const { sub, picture, given_name: firstName, family_name: lastName } = decoded;
+
+  const jwtToken = signToken({
+    sub,
+    picture,
+    firstName,
+    lastName
+  });
+
+  ctx.body = {
+    token: jwtToken
+  };
+});
+
+router.post('/oauth/verify', jwtAuth, ctx => {
+  ctx.status = 200;
 });
 
 router.post('/session', ctx => {
