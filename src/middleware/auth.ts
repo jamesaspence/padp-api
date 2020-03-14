@@ -1,6 +1,5 @@
 import { Context, Middleware } from 'koa';
 import { OAuth2Client } from 'google-auth-library';
-import * as jwt from 'jsonwebtoken';
 import { verifyToken } from '../auth';
 
 export const googleOAuth: Middleware = async (ctx, next): Promise<any> => {
